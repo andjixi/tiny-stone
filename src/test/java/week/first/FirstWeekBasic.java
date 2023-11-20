@@ -23,15 +23,21 @@ public class FirstWeekBasic {
 
         driver.get("https://www.saucedemo.com/");
 
-        WebElement usernameFieldID =
-                driver.findElement(By.id("user-name"));
+        WebElement usernameFieldID = driver.findElement(By.id("user-name"));
+        usernameFieldID.sendKeys("standard_user");
 
-        usernameFieldID.sendKeys("AAAAAAAAAAAAA");
+        WebElement usernameFieldName = driver.findElement(By.name("user-name"));
+        usernameFieldName.sendKeys("standard_user");
 
-        WebElement usernameFieldName =
-                driver.findElement(By.name("user-name"));
+        WebElement passwordFieldID = driver.findElement(By.id("password"));
+        passwordFieldID.sendKeys("secret_sauce");
 
-        usernameFieldName.sendKeys("BBBBBBBBBBBB");
+        WebElement loginButtonID = driver.findElement(By.id("login-button"));
+        loginButtonID.click();
+
+        // successful login
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.urlContains("inventory.html"));
 
         driver.quit();
     }
@@ -51,25 +57,21 @@ public class FirstWeekBasic {
 
         System.out.println("CURRENT URL IS -> " + currentURL);
 
-        WebElement usernameFieldXPath =
-                driver.findElement(By.xpath("//input[@type='text']"));
-
-        usernameFieldXPath.sendKeys("standard_user");
+        WebElement usernameFieldXPath = driver.findElement(By.xpath("//input[@type='text']"));
+        usernameFieldXPath.sendKeys("nevalidan_korisnik");
 
 
-        WebElement usernameFieldCSS =
-                driver.findElement(By.cssSelector("input[type='password']"));
+        WebElement usernameFieldCSS = driver.findElement(By.cssSelector("input[type='password']"));
+        usernameFieldCSS.sendKeys("pogresna_lozinka");
 
-        usernameFieldCSS.sendKeys("secret_sauce");
-
-        WebElement logInButtonCSS =
-                driver.findElement(By.cssSelector("input[value='Login']"));
-
+        WebElement logInButtonCSS = driver.findElement(By.cssSelector("input[value='Login']"));
         logInButtonCSS.click();
 
         WebDriverWait wait =
                 new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.titleIs("Swag Labs"));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("h3[data-test='error']")));
+
+//        wait.until(ExpectedConditions.titleIs("Swag Labs"));
 
 
         currentURL =
