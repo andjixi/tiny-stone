@@ -1,8 +1,10 @@
 package week.first;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -11,7 +13,6 @@ import org.testng.annotations.Test;
 
 
 public class FirstWeekAdvanced {
-
 
 
     private static final String USERNAME = "standard_user";
@@ -23,9 +24,9 @@ public class FirstWeekAdvanced {
     @BeforeMethod
     public void setup(String browser){
 
-        //    WebDriverManager.firefoxdriver().setup();
-        //    WebDriver driver = new FirefoxDriver();
-        //    driver.get("http://localhost:9010");
+        WebDriverManager.firefoxdriver().setup();
+        WebDriver driver = new FirefoxDriver();
+        driver.get("http://localhost:9010");
 
         driver = WebDriverFabric.startBrowser(browser);
 
@@ -33,92 +34,47 @@ public class FirstWeekAdvanced {
 
 
     @Test
-    public void thirdTest(){
-
-
-     //   String currentURL =
-     //           driver.getCurrentUrl();
-     //   System.out.println("CURRENT URL IS -> " + currentURL);
+    public void thirdTestHappyFlow(){
 
         LoginPage loginPage = new LoginPage(driver);
-
-        loginPage.getCurrentUrl();
-
-
-    //    WebElement usernameFieldXPath =
-    //            driver.findElement(By.xpath("//input[@type='text']"));
-    //    usernameFieldXPath.sendKeys("admin");
-
         loginPage.typeOnUsernameFieldXPath(USERNAME);
-
-
-    //    WebElement usernameFieldCSS =
-    //           driver.findElement(By.cssSelector("input[type='password']"));
-    //    usernameFieldCSS.sendKeys("password");
-
         loginPage.typeOnPasswordFieldCSS(PASSWORD);
-
-    //    WebElement logInButtonCSS =
-    //            driver.findElement(By.cssSelector("input[value='Login']"));
-    //    logInButtonCSS.click();
-
         loginPage.clickOnLoginButton();
 
-
         HomePage homePage = new HomePage(driver);
-
-
-    //    WebDriverWait wait =
-    //            new WebDriverWait(driver, Duration.ofSeconds(10));
-    //    wait.until(ExpectedConditions.titleIs("Swag Labs"));
-
         homePage.waitUntilPageTitleIsCorrect(5, HomePage.PAGE_TITLE);
-
-
-    //    currentURL =
-    //            driver.getCurrentUrl();
-    //    System.out.println("CURRENT URL IS -> " + currentURL);
-
         homePage.getCurrentUrl();
-
-
-    //    WebElement menu = driver.findElement((By.id("react-burger-menu-btn")));
-    //    menu.click();
 
         TopMenu topMenu = new TopMenu(driver);
 
-        topMenu.clickTopMenu();
+        // add product to basket
+        homePage.addProductToCart("Sauce Labs Backpack");
 
+        // save the current number of products in the basket
+        int cartItemCountBeforeCheckout = topMenu.getCartItemCount();
 
+        // finish shopping
+        homePage.finishPurchase();
 
-    //    WebElement logOutButton =
-    //            driver.findElement(By.id("logout_sidebar_link"));
-    //    logOutButton.click();
+        // check if success
+        Assert.assertTrue(homePage.isOrderCompleted(), "Order was not completed successfully.");
 
-        homePage.clickLogoutButton();
+        // check reset in basket
+        int cartItemCountAfterCheckout = topMenu.getCartItemCount();
+        Assert.assertEquals(cartItemCountAfterCheckout, 0,
+                "Number of items in the cart is not reset after completing the purchase.");
 
-
-    //    currentURL =
-    //            driver.getCurrentUrl();
-    //    System.out.println("CURRENT URL IS -> " + currentURL);
-
-        loginPage.getCurrentUrl();
-
-        Assert.assertTrue(loginPage.isLoginButtonVisible(), "yrytryturuytrjtyr");
+        Assert.assertTrue(loginPage.isLoginButtonVisible(), "Login button is not visible after completing the purchase.");
 
     }
 
 
     @AfterMethod
     public void teardown(){
-
-
-            LoginPage loginPage = new LoginPage(driver);
-
-            loginPage.quitBrowser();
-
+        if (driver != null) {
+            driver.quit();
+        }
     }
-
 }
 
 
